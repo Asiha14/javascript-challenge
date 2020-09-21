@@ -13,11 +13,15 @@ var tableBody = d3.select("tbody");
 
 // Create event handlers 
 button.on("click", runEnter);
-form.on("submit", runEnter);
+form.on("keypress", function () {
+    if (d3.event.keyCode === 13) {
+      runEnter();
+    };
+  });
 
 // Complete the event handler function for the form
 function runEnter() {
-
+  // Clear old table if there is one.
   d3.selectAll("td").remove()
   
  // Prevent the page from refreshing
@@ -34,10 +38,13 @@ function runEnter() {
   var inputValueState = inputElementState.property("value");
   var inputValueCountry = inputElementCountry.property("value");
   var inputValueShape = inputElementShape.property("value");
-  
+  // Fix date formating to accept zeros
+  var parseTime = d3.timeParse("%-m/%-d/%Y");
+  var parseDate = d3.timeFormat("%-m/%-d/%Y");
+  // filter data
   var filterData = tableData.filter(siting => {
     return (
-      siting.datetime.includes(inputValueDate) &&
+      siting.datetime.includes(parseDate(parseTime(inputValueDate))) &&
       siting.city.includes(inputValueCity.toLowerCase())&&
       siting.state.includes(inputValueState.toLowerCase())&&
       siting.country.includes(inputValueCountry.toLowerCase())&&
@@ -45,6 +52,7 @@ function runEnter() {
     )
   });
 
+// Print data to the screen if available
   if (filterData.length > 0 ){
     filterData.forEach( siting =>{
       var tr = tableBody.append("tr")
