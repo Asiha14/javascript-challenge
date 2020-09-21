@@ -19,7 +19,7 @@ form.on("submit", runEnter);
 function runEnter() {
 
   d3.selectAll("td").remove()
-  d3.select(this)
+  
  // Prevent the page from refreshing
   d3.event.preventDefault();
   // Select the input element and get the raw HTML node
@@ -34,63 +34,29 @@ function runEnter() {
   var inputValueState = inputElementState.property("value");
   var inputValueCountry = inputElementCountry.property("value");
   var inputValueShape = inputElementShape.property("value");
-
-  if (inputValueDate === null){
-    var filterDate = tableData;
-  }
-  else{
-    var filterDate = tableData.filter(siting => siting.datetime === inputValueDate);
-  };
-
-  if (inputValueCity === null){
-    var filterCity = filterDate;
-  }
-  else{
-    var filterCity = filterDate.filter(siting => siting.city === inputValueCity.toLowerCase());
-  };
-
-  if (inputValueState === null){
-    var filterState = filterCity;
-  }
-  else{
-    var filterState = filterCity.filter(siting => siting.state === inputValueState.toLowerCase());
-  };
-
-  if (inputValueCountry === null){
-    var filterCountry = filterState;
-  }
-  else{
-    var filterCountry = filterState.filter(siting => siting.country === inputValueCountry.toLowerCase());
-  };
-
-  if (inputValueShape === null){
-    var filterShape = filterCountry;
-  }
-  else{
-    var filterShape = filterCountry.filter(siting => siting.shape === inputValueShape.toLowerCase());
-  };
-
-  console.log(inputValueDate);
-  console.log(inputValueCity);
-  console.log(inputValueState);
-  console.log(inputValueCountry);
-  console.log(inputValueShape);
-  console.log(filterShape);
-
-  filterShape.forEach( siting =>{
-    var tr = tableBody.append("tr")
-    
-    Object.entries(siting).forEach(([key, value]) =>{
-        var td=tr.append("td")
-        td.text(value)
-    });
+  
+  var filterData = tableData.filter(siting => {
+    return (
+      siting.datetime.includes(inputValueDate) &&
+      siting.city.includes(inputValueCity.toLowerCase())&&
+      siting.state.includes(inputValueState.toLowerCase())&&
+      siting.country.includes(inputValueCountry.toLowerCase())&&
+      siting.shape.includes(inputValueShape.toLowerCase())
+    )
   });
 
-    //   people
-    //   .filter(person => person.bloodType===inputValue)
-    //   .map(person =>person.fullName)
-    //   .forEach(name => ul.append("li").text(name))
-
-
+  if (filterData.length > 0 ){
+    filterData.forEach( siting =>{
+      var tr = tableBody.append("tr")
+      
+      Object.entries(siting).forEach(([key, value]) =>{
+          var td=tr.append("td")
+          td.text(value)
+      });
+    });
+  }
+  else{
+    var tr = tableBody.append("tr").append("td").text(" No Data Found. Please modify your search.").style("color", "red");
+  }
 
 };
