@@ -18,7 +18,8 @@ form.on("submit", runEnter);
 // Complete the event handler function for the form
 function runEnter() {
 
-    d3.selectAll("td").remove()
+  // Remove table if one exists
+  d3.selectAll("td").remove()
 
  // Prevent the page from refreshing
   d3.event.preventDefault();
@@ -26,22 +27,27 @@ function runEnter() {
   var inputElement = d3.select("#datetime");
   // Get the value property of the input element
   var inputValue = inputElement.property("value");
+  // Fix date formating to accept zeros
+  var parseTime = d3.timeParse("%-m/%-d/%Y");
+  var parseDate = d3.timeFormat("%-m/%-d/%Y");
 
-  var filtered = tableData.filter(siting => siting.datetime === inputValue);
-  console.log(filtered);
-  filtered.forEach( siting =>{
-    var tr = tableBody.append("tr")
-    
-    Object.entries(siting).forEach(([key, value]) =>{
-        var td=tr.append("td")
-        td.text(value)
+  // Filter Data
+  var filtered = tableData.filter(siting => siting.datetime === parseDate(parseTime(inputValue)));
+
+  // Print data to the screen if available
+  if (filtered.length > 0 ){
+    filtered.forEach( siting =>{
+      var tr = tableBody.append("tr")
+      
+      Object.entries(siting).forEach(([key, value]) =>{
+          var td=tr.append("td")
+          td.text(value)
+      });
     });
-  });
-
-    //   people
-    //   .filter(person => person.bloodType===inputValue)
-    //   .map(person =>person.fullName)
-    //   .forEach(name => ul.append("li").text(name))
+  }
+  else{
+    var tr = tableBody.append("tr").append("td").text(" No Data Found. Please modify your search.").style("color", "red");
+  }
 
 
 

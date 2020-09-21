@@ -52,7 +52,7 @@ function runEnter() {
     )
   });
 
-// Print data to the screen if available
+  // Print data to the screen if available
   if (filterData.length > 0 ){
     filterData.forEach( siting =>{
       var tr = tableBody.append("tr")
