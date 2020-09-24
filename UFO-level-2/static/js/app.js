@@ -14,10 +14,10 @@ var tableBody = d3.select("tbody");
 // Create event handlers 
 button.on("click", runEnter);
 form.on("keypress", function () {
-    if (d3.event.keyCode === 13) {
-      runEnter();
-    };
-  });
+  if (d3.event.keyCode === 13) {
+    runEnter();
+  };
+});
 
 // Complete the event handler function for the form
 function runEnter() {
@@ -32,27 +32,40 @@ function runEnter() {
   var inputElementState = d3.select("#state");
   var inputElementCountry = d3.select("#country");
   var inputElementShape = d3.select("#shape");
-  // Get the value property of the input element
-  var inputValueDate = inputElementDate.property("value");
-  var inputValueCity = inputElementCity.property("value");
-  var inputValueState = inputElementState.property("value");
-  var inputValueCountry = inputElementCountry.property("value");
-  var inputValueShape = inputElementShape.property("value");
-  // Fix date formating to accept zeros
+
+
+  // // Get the value property of the input element for date and fix formatting if not null
   var parseTime = d3.timeParse("%-m/%-d/%Y");
   var parseDate = d3.timeFormat("%-m/%-d/%Y");
-  // filter data
-  var filterData = tableData.filter(siting => {
-    return (
-      siting.datetime.includes(parseDate(parseTime(inputValueDate))) &&
-      siting.city.includes(inputValueCity.toLowerCase())&&
-      siting.state.includes(inputValueState.toLowerCase())&&
-      siting.country.includes(inputValueCountry.toLowerCase())&&
-      siting.shape.includes(inputValueShape.toLowerCase())
-    )
-  });
+  var inputValueDate = inputElementDate.property("value");
+  if (inputValueDate != ""){
+    inputValueDate = parseDate(parseTime(inputValueDate))
+  }
+  
+  // Object to store all input
+  var input = new Object();
+  input['datetime'] = inputValueDate;
+  input['city'] = inputElementCity.property("value").toLowerCase();
+  input['state']= inputElementState.property("value").toLowerCase();
+  input['country'] = inputElementCountry.property("value").toLowerCase();
+  input['shape']= inputElementShape.property("value").toLowerCase();
 
-  // Print data to the screen if available
+  // Delete empty input
+  Object.entries(input).forEach( ([key,value]) => {
+     if(value === ""){   
+      delete input[key];
+    };
+  });
+  
+  // Filter Data
+  var filterData = tableData;
+  Object.entries(input).forEach(([key,value]) => {
+    filterData = filterData.filter(siting => {
+      return siting[key] === value
+    });
+ });
+
+  // // Print data to the screen if available
   if (filterData.length > 0 ){
     filterData.forEach( siting =>{
       var tr = tableBody.append("tr")
@@ -67,4 +80,5 @@ function runEnter() {
     var tr = tableBody.append("tr").append("td").text(" No Data Found. Please modify your search.").style("color", "red");
   }
 
+  console.log(filterData)
 };
